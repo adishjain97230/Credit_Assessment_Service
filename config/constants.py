@@ -1,0 +1,1 @@
+switch_properties = "switch_properties.json"
