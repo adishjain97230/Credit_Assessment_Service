@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+
+# Data
+data/
+*.csv
+
+# # Models
+# models/
+# *.pkl
+
+# Logs
+*.log
+
+# # Config secrets
+# secrets.*
+# .env
+
+# # OS files
+# .DS_Store
+# Thumbs.db
+
+# # Jupyter
+# .ipynb_checkpoints/
+
+# Random files
+*rough*
