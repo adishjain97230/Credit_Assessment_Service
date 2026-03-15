@@ -1,1 +1,5 @@
 switch_properties = "switch_properties.json"
+data_cleaning = "data_cleaning"
+log_path = "log_path"
+dataset_path = "dataset_path"
+credit_assessment = "credit_assessment"
