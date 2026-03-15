@@ -1,17 +1,9 @@
-import json
-import csv
 import pandas as pd
-from pathlib import Path
-from config import constants
+from config import constants, switch_properties
 
-def getSwitchProperties():
-    base_dir = Path(__file__).resolve().parent
-    file_path = base_dir / constants.switch_properties
-    with open(file_path, "r") as f:
-        switch_properties = json.load(f)
-    return switch_properties
-    
+def main():
+    df = pd.read_csv(switch_properties.SWITCH_PROPERTIES[constants.data_cleaning][constants.dataset_path])
+    print(df.head())
 
 if __name__ == "__main__":
-    switch_properties = getSwitchProperties()
-    
+    main()
