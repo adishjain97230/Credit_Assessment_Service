@@ -1,6 +1,7 @@
 {
     "log_path": "logs/credit_assessment.log",
     "data_cleaning": {
+        "post_dataset_path": "data/dataset_data_cleaning.parquet",
         "dataset_path": "data/accepted_2007_to_2018Q4.csv",
         "target_column": {
             "loan_status": {
