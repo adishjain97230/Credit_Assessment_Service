@@ -48,5 +48,15 @@
             "total_acc",
             "pub_rec"
         ]
+    },
+    "eda": {
+        "dataset_path": "data/dataset_data_cleaning.parquet",
+        "histograms_path": "eda/histograms.png",
+        "bargraphs_path": "eda/bargraphs.png",
+        "violin_plots_path": "eda/violin_plots.png",
+        "heatmap_path": "eda/heatmap.png"
+    },
+    "models": {
+        "dataset_path": "data/dataset_data_cleaning.parquet"
     }
 }

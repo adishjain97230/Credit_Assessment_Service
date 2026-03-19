@@ -58,7 +58,7 @@ def ConvertEarliestCrLineToNumeric(df, column):
     dt = pd.to_datetime(df[column], format="%b-%Y", errors="coerce")
     df[f"{column}_month"] = dt.dt.month.astype("Int64")   # nullable int
     df[f"{column}_year"] = dt.dt.year.astype("Int64")
-    return df.dropna(how="any").copy()
+    return df.drop(columns=[column]).dropna(how="any").copy()
 
 def getRawData(n = None):
     path = module_properties[constants.dataset_path]
@@ -93,7 +93,7 @@ columnSpecificCleaning = {
     "earliest_cr_line": ConvertEarliestCrLineToNumeric,
 }
 
-def convertStringColumnsToNumeric(df): #TODO clean
+def convertStringColumnsToNumeric(df):
     for key, value in columnSpecificCleaning.items():
         df = value(df, key)
 
