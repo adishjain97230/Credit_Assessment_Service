@@ -1,5 +1,7 @@
 from config import logging_config
 from data_cleaning import dataCleaning
+from eda import eda
+from models import logistic_regression
 from config import constants
 import argparse
 
@@ -15,6 +17,7 @@ def main():
     args = getCommandLineArguments()
     logging_config.setup_logger()
     dataCleaning.main(repeat_all_parts=args.repeat_all_parts)
+    eda.main(repeat_all_parts=args.repeat_all_parts)
 
 
 
