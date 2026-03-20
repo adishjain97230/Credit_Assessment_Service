@@ -17,9 +17,7 @@ def saveBargraphs(df):
     str_cols = df.select_dtypes(include=["object", "string"]).columns
     n_cols = len(str_cols)
 
-    if n_cols == 0:
-        print("No string columns")
-    else:
+    if n_cols != 0:
         fig, axes = plt.subplots((n_cols + 1) // 2, 2, figsize=(12, 4 * ((n_cols + 1) // 2)))
         axes = axes.flatten() if n_cols > 1 else [axes]
         for ax, col in zip(axes, str_cols):
@@ -61,7 +59,7 @@ def saveMeanEncodedHeatmap(df, target="y"):
     mean-encoded by target. Every cell = Pearson correlation.
     """
     if target not in df.columns:
-        print(f"Target '{target}' not in DataFrame")
+        logger.error(f"Target '{target}' not in DataFrame")
         return
 
     # Numeric columns (exclude target so it's not duplicated as predictor)
@@ -77,7 +75,7 @@ def saveMeanEncodedHeatmap(df, target="y"):
     combined[target] = df[target]
 
     if combined.shape[1] < 2:
-        print("Need at least 2 columns for heat map")
+        logger.info("Need at least 2 columns for heat map. Skipping...")
         return
 
     corr = combined.corr()

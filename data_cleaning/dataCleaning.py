@@ -83,8 +83,21 @@ def selectColumns(df):
     target_column = list(module_properties[constants.target_column])[0]
     target_column_mapping = module_properties[constants.target_column][target_column]
     df["y"] = df[target_column].map(target_column_mapping)
-    columns = module_properties[constants.selected_columns] + ["y"]
-    return df[columns].dropna(how="any").copy()
+    columns = module_properties[constants.selected_columns]
+
+    final_columns = ["y"]
+
+    for i in columns:
+        col_na_count = df[i].isna().sum()
+        if col_na_count / len(df) > module_properties[constants.missing_values_threshold]:
+            logger.warning(f"Column {i} has more than 10% missing values")
+            if (i in module_properties[constants.default_values]):
+                df[i] = df[i].fillna(module_properties[constants.default_values][i])
+                final_columns.append(i)
+        else:
+            final_columns.append(i)
+    
+    return df[final_columns].dropna(how="any").copy()
 
 
 columnSpecificCleaning = {

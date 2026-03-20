@@ -18,6 +18,7 @@ def main():
     logging_config.setup_logger()
     dataCleaning.main(repeat_all_parts=args.repeat_all_parts)
     eda.main(repeat_all_parts=args.repeat_all_parts)
+    logistic_regression.main()
 
 
 

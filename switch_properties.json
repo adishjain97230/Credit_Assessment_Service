@@ -5,11 +5,18 @@
         "dataset_path": "data/accepted_2007_to_2018Q4.csv",
         "target_column": {
             "loan_status": {
-                "Fully Paid": 1,
-                "Charged Off": 0
+                "Fully Paid": 0,
+                "Charged Off": 1
             }
         },
         "selected_columns": [
+            "int_rate",
+            "installment",
+            "sub_grade",
+            "dti",
+            "initial_list_status",
+            "mths_since_last_delinq",
+            "mths_since_last_record",
             "num_op_rev_tl",
             "zip_code",
             "delinq_2yrs",
@@ -47,7 +54,12 @@
             "collections_12_mths_ex_med",
             "total_acc",
             "pub_rec"
-        ]
+        ],
+        "default_values": {
+            "mths_since_last_delinq": 999,
+            "mths_since_last_record": 999
+        },
+        "missing_values_threshold": 0.1
     },
     "eda": {
         "dataset_path": "data/dataset_data_cleaning.parquet",
@@ -57,6 +69,9 @@
         "heatmap_path": "eda/heatmap.png"
     },
     "models": {
-        "dataset_path": "data/dataset_data_cleaning.parquet"
+        "dataset_path": "data/dataset_data_cleaning.parquet",
+        "logistic_regression": {
+            "ohe_columns_threshold": 60
+        }
     }
 }
