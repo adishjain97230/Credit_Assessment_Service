@@ -71,7 +71,8 @@
     "models": {
         "dataset_path": "data/dataset_data_cleaning.parquet",
         "logistic_regression": {
-            "ohe_columns_threshold": 60
+            "ohe_columns_threshold": 60,
+            "model_path": "models/logistic_regression.joblib"
         }
     }
 }

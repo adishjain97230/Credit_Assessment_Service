@@ -3,9 +3,12 @@ import pandas as pd
 from models import split
 from sklearn import linear_model, metrics, preprocessing
 import numpy as np
+import joblib
 
 logger = logging_config.get_logger(__name__)
 module_properties = switch_properties.SWITCH_PROPERTIES[constants.models]
+
+logistic_regression_model = {}
 
 def main():
     logger.info("Logistic Regression Model")
@@ -20,7 +23,11 @@ def main():
 
     model = split_data.getBestModelWithC()
 
+    logistic_regression_model[constants.model] = model
+
     threshold = split_data.getBestThreshold(model)
+
+    logistic_regression_model[constants.p_threshold] = threshold
 
     p_default_test = model.predict_proba(split_data.X_test)[:, 1]
     y_pred = (p_default_test >= threshold).astype(int)
@@ -32,6 +39,8 @@ def main():
     logger.info("F1 Score: %f", metrics.f1_score(split_data.y_test, y_pred))
     logger.info("Confusion Matrix:\n%s", metrics.confusion_matrix(split_data.y_test, y_pred))
     logger.info("Classification Report:\n%s", metrics.classification_report(split_data.y_test, y_pred))
+
+    joblib.dump(logistic_regression_model, module_properties[constants.logistic_regression][constants.model_path])
 
 
 if __name__ == "__main__":

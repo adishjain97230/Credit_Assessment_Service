@@ -5,3 +5,4 @@ matplotlib==3.10.8
 seaborn==0.13.2
 pyarrow==23.0.1
 django==6.0.3
+djangorestframework==3.17.0

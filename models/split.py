@@ -2,6 +2,7 @@ from sklearn import model_selection, preprocessing, linear_model, metrics
 import pandas as pd
 from config import logging_config, switch_properties, constants
 import numpy as np
+from models import logistic_regression
 
 logger = logging_config.get_logger(__name__)
 module_properties = switch_properties.SWITCH_PROPERTIES[constants.models]
@@ -41,6 +42,9 @@ class SplitData:
         ohe_cols = [i for i in cat_cols if unique_values[i] < ohe_columns_threshold]
         me_cols = [i for i in cat_cols if unique_values[i] >= ohe_columns_threshold]
 
+        logistic_regression.logistic_regression_model[constants.ohe_cols] = ohe_cols
+        logistic_regression.logistic_regression_model[constants.me_cols] = me_cols
+
         datasets = [self.X, self.X_train, self.X_test]
         if (self.validation_set):
             datasets.append(self.X_val)
@@ -48,6 +52,7 @@ class SplitData:
         enc = preprocessing.OneHotEncoder(drop=None, sparse_output=False, handle_unknown="ignore")
         enc.fit(self.X_train[ohe_cols].astype(str))
         ohe_cols_names = enc.get_feature_names_out(ohe_cols)
+        logistic_regression.logistic_regression_model[constants.ohe_enc] = enc
 
         for i in range(len(datasets)):
             ohe_cols_df = enc.transform(datasets[i][ohe_cols].astype(str))
@@ -65,14 +70,21 @@ class SplitData:
         train_df["__y__"] = self.y_train.values
         global_mean = float(self.y_train.mean())
 
+        logistic_regression.logistic_regression_model[constants.global_mean] = global_mean
+
+        mappings = {}
+
         for col in me_cols:
             mapping = train_df.groupby(col)["__y__"].mean()
             counts = train_df.groupby(col).size()
             mapping = mapping.where(counts >= 30, other=global_mean)
+            mappings[col] = mapping
             for i in range(len(datasets)):
                 datasets[i] = datasets[i].copy()
                 datasets[i][f"{col}_enc"] = datasets[i][col].map(mapping).fillna(global_mean).astype(float)
                 datasets[i] = datasets[i].drop(columns=col)
+        
+        logistic_regression.logistic_regression_model[constants.me_mappings] = mappings
         
         self.X = datasets[0].copy()
         self.X_train = datasets[1].copy()
@@ -84,7 +96,9 @@ class SplitData:
     def standardizeColumns(self):
 
         scaler = preprocessing.StandardScaler()
+        logistic_regression.logistic_regression_model[constants.all_cols] = self.X_train.columns.to_list()
         self.X_train = scaler.fit_transform(self.X_train)
+        logistic_regression.logistic_regression_model[constants.scaler] = scaler
         self.X_test = scaler.transform(self.X_test)
         self.X = scaler.transform(self.X)
 
