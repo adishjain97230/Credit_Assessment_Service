@@ -27,13 +27,17 @@ def meEncode(df, model):
 def predict(df, model):
     df = dataCleaning.convertStringColumnsToNumeric(df)
 
+    if (len(df) <= 0):
+        logger.warning("Textual columns are not in correct format")
+        return None, None, ValueError("Textual Columns are not in correct format")
+
     df = oheEncode(df, model)
 
     df = meEncode(df, model)[model[constants.all_cols]]
 
     df = model[constants.scaler].transform(df)
 
-    return model[constants.model].predict_proba(df)[:, 1], model[constants.p_threshold]
+    return model[constants.model].predict_proba(df)[:, 1], model[constants.p_threshold], None
 
 
 def main():

@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from config import logging_config, switch_properties, constants
+from config import logging_config, switch_properties, constants, utils
 from .serializers import LogisticRegressionPredictSerializer
 import pandas as pd
 from data_cleaning import dataCleaning
@@ -30,7 +30,13 @@ def health_check(request):
 @require_http_methods(["POST"])
 @csrf_exempt
 def logistic_regression_predict(request):
-    data = json.loads(request.body)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        logger.warning("invalid JSON: %s", e)
+        return JsonResponse({"status": "error", "errors": "Invalid JSON body"}, status=400)
+
     serializer = LogisticRegressionPredictSerializer(data=data)
 
     if not(serializer.is_valid()):
@@ -41,7 +47,10 @@ def logistic_regression_predict(request):
 
     model = joblib.load(switch_properties.SWITCH_PROPERTIES[constants.models][constants.logistic_regression][constants.model_path])
 
-    p, threshold = logistic_regression.predict(df, model)
+    p, threshold, error = logistic_regression.predict(df, model)
+
+    if error != None:
+        return JsonResponse({"status": "not ok", "error": utils.getErrorJsonObject(error)})
 
 
-    return JsonResponse({"status": "ok", "data": "success", "threshold": float(threshold), "p": float(p[0])}, status=200)
+    return JsonResponse({"status": "ok", "threshold": float(threshold), "p": float(p[0])}, status=200)
