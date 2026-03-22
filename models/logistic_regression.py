@@ -4,11 +4,37 @@ from models import split
 from sklearn import linear_model, metrics, preprocessing
 import numpy as np
 import joblib
+from data_cleaning import dataCleaning
 
 logger = logging_config.get_logger(__name__)
 module_properties = switch_properties.SWITCH_PROPERTIES[constants.models]
 
 logistic_regression_model = {}
+
+def oheEncode(df, model):
+    ohe_df = model[constants.ohe_enc].transform(df[model[constants.ohe_cols]].astype(str))
+    ohe_cols_names = model[constants.ohe_enc].get_feature_names_out(model[constants.ohe_cols])
+    ohe_df = pd.DataFrame(ohe_df, columns=ohe_cols_names, index=df.index)
+    return pd.concat([df.drop(columns=model[constants.ohe_cols]), ohe_df], axis=1).copy()
+
+def meEncode(df, model):
+    for col in model[constants.me_cols]:
+        df[f"{col}_enc"] = df[col].map(model[constants.me_mappings][col]).fillna(model[constants.global_mean]).astype(float)
+        df = df.drop(columns=col)
+    
+    return df
+
+def predict(df, model):
+    df = dataCleaning.convertStringColumnsToNumeric(df)
+
+    df = oheEncode(df, model)
+
+    df = meEncode(df, model)[model[constants.all_cols]]
+
+    df = model[constants.scaler].transform(df)
+
+    return model[constants.model].predict_proba(df)[:, 1], model[constants.p_threshold]
+
 
 def main():
     logger.info("Logistic Regression Model")
