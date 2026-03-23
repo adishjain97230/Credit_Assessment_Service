@@ -19,4 +19,9 @@ https://www.kaggle.com/datasets/wordsforthewise/lending-club?resource=download
 2. 
 
 
+python 3.14+ is required
+then install dependencies from requirements.txt
+Then run main.py
+change allowed_hosts
+
 Note: Redis is required.
