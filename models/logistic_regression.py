@@ -5,11 +5,18 @@ from sklearn import linear_model, metrics, preprocessing
 import numpy as np
 import joblib
 from data_cleaning import dataCleaning
+from pathlib import Path
 
 logger = logging_config.get_logger(__name__)
 module_properties = switch_properties.SWITCH_PROPERTIES[constants.models]
 
-logistic_regression_model = {}
+def loadModel():
+    if Path(module_properties[constants.logistic_regression][constants.model_path]):
+        return joblib.load(module_properties[constants.logistic_regression][constants.model_path])
+    else:
+        return {}
+
+logistic_regression_model = loadModel()
 
 def oheEncode(df, model):
     ohe_df = model[constants.ohe_enc].transform(df[model[constants.ohe_cols]].astype(str))
@@ -24,7 +31,7 @@ def meEncode(df, model):
     
     return df
 
-def predict(df, model):
+def predict(df, model = logistic_regression_model):
     df = dataCleaning.convertStringColumnsToNumeric(df)
 
     if (len(df) <= 0):

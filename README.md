@@ -16,3 +16,7 @@ https://www.kaggle.com/datasets/wordsforthewise/lending-club?resource=download
 ### Individual Components
 
 1. Data Cleaning: Get to the Credit_Assessment_Service and run "python -m data_cleaning.dataCleaning"
+2. 
+
+
+Note: Redis is required.

@@ -9,6 +9,7 @@ from .serializers import LogisticRegressionPredictSerializer
 import pandas as pd
 from data_cleaning import dataCleaning
 from models import logistic_regression
+from . import services
 
 # Create your views here.
 
@@ -31,26 +32,14 @@ def health_check(request):
 @csrf_exempt
 def logistic_regression_predict(request):
 
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError as e:
-        logger.warning("invalid JSON: %s", e)
-        return JsonResponse({"status": "error", "errors": "Invalid JSON body"}, status=400)
+    df, error = services.validateLogisticRegressionRequest(request)
+    if error != None:
+        return JsonResponse({"status": "error", "error": utils.getErrorJsonObject(error)}, status=400)
 
-    serializer = LogisticRegressionPredictSerializer(data=data)
-
-    if not(serializer.is_valid()):
-        logger.error("Request is not valid: %s", serializer.errors)
-        return JsonResponse({"status": "error", "errors": serializer.errors}, status=400)
-    
-    df = pd.DataFrame([serializer.validated_data["data"]])
-
-    model = joblib.load(switch_properties.SWITCH_PROPERTIES[constants.models][constants.logistic_regression][constants.model_path])
-
-    p, threshold, error = logistic_regression.predict(df, model)
+    p, threshold, error = logistic_regression.predict(df)
 
     if error != None:
-        return JsonResponse({"status": "not ok", "error": utils.getErrorJsonObject(error)})
+        return JsonResponse({"status": "error", "error": utils.getErrorJsonObject(error)})
 
 
     return JsonResponse({"status": "ok", "threshold": float(threshold), "p": float(p[0])}, status=200)
