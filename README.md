@@ -24,4 +24,4 @@ then install dependencies from requirements.txt
 Then run main.py
 change allowed_hosts
 
-Note: Redis is required.
+Note: Redis is actually required.
