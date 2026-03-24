@@ -30,7 +30,7 @@ DEBUG = True
 # ALLOWED_HOSTS = ["192.168.1.3", "192.168.1.5"]     # TODO
 # ALLOWED_HOSTS = ["*"]
 # ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "document-interior.gl.joinmc.link"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
