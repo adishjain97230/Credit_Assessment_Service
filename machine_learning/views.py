@@ -42,4 +42,4 @@ def logistic_regression_predict(request):
         return JsonResponse({"status": "error", "error": utils.getErrorJsonObject(error)})
 
 
-    return JsonResponse({"status": "ok", "threshold": float(threshold), "p": float(p[0])}, status=200)
+    return JsonResponse({"status": "ok", "thresheld": float(threshold), "p": float(p[0])}, status=200)
