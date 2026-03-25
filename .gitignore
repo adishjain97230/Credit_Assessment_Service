@@ -21,7 +21,7 @@ data/
 
 # # Config secrets
 # secrets.*
-# .env
+.env
 
 # # OS files
 # .DS_Store
