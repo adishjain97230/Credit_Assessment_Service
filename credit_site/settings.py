@@ -32,7 +32,7 @@ DEBUG = False
 # ALLOWED_HOSTS = ["192.168.1.3", "192.168.1.5"]     # TODO
 # ALLOWED_HOSTS = ["*"]
 # ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-ALLOWED_HOSTS = os.getenv['DJANGO_ALLOWED_HOSTS'].split(",")
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(",")
 
 
 # Application definition
