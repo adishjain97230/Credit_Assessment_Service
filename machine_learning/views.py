@@ -17,11 +17,14 @@ from django_ratelimit.decorators import ratelimit
 logger = logging_config.get_logger(__name__)
 
 @require_http_methods(["GET"])
-@ratelimit(key="ip", rate="10/m")
+@ratelimit(key=lambda g, r: "global", rate="2000/m")
+@ratelimit(key="ip", rate="20/m")
 def health(request):
     return JsonResponse({"status": "ok"})
 
 @require_http_methods(["POST"])
+@ratelimit(key=lambda g, r: "global", rate="2000/m")
+@ratelimit(key="ip", rate="5/m")
 @csrf_exempt
 def health_check(request):
     data = json.loads(request.body)
@@ -31,6 +34,8 @@ def health_check(request):
     return JsonResponse({"status": "ok", "data": data, "headers": dict(headers)}, status=200)
 
 @require_http_methods(["POST"])
+@ratelimit(key=lambda g, r: "global", rate="2000/m")
+@ratelimit(key="ip", rate="10/m")
 @csrf_exempt
 def logistic_regression_predict(request):
 
