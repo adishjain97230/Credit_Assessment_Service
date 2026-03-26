@@ -27,7 +27,12 @@ def health(request):
 @ratelimit(key="ip", rate="5/m")
 @csrf_exempt
 def health_check(request):
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        logger.warning("health_check: invalid JSON: %s", e)
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
     headers = request.headers
     logger.info("printing body: %s", data)
     logger.info("printing headers: %s", dict(headers))
