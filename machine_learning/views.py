@@ -10,12 +10,14 @@ import pandas as pd
 from data_cleaning import dataCleaning
 from models import logistic_regression
 from . import services
+from django_ratelimit.decorators import ratelimit
 
 # Create your views here.
 
 logger = logging_config.get_logger(__name__)
 
 @require_http_methods(["GET"])
+@ratelimit(key="ip", rate="10/m")
 def health(request):
     return JsonResponse({"status": "ok"})
 
