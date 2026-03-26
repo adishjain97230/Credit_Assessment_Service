@@ -1,13 +1,12 @@
-version: '3.8'
-
 services:
   web:
     build: .
     command: uvicorn credit_site.asgi:application --host 0.0.0.0 --port 8000 --workers 4
+    restart: unless-stopped
     # volumes:
       # - .:/app
     ports:
       - "8000:8000"
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,192.168.1.6
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,13.236.109.109
