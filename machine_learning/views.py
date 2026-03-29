@@ -17,16 +17,20 @@ from django_ratelimit.decorators import ratelimit
 logger = logging_config.get_logger(__name__)
 
 @require_http_methods(["GET"])
-@ratelimit(key=lambda g, r: "global", rate="2000/m")
-@ratelimit(key="ip", rate="20/m")
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key="ip", rate="20/m", block=False)
 def health(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
     return JsonResponse({"status": "ok"})
 
 @require_http_methods(["POST"])
-@ratelimit(key=lambda g, r: "global", rate="2000/m")
-@ratelimit(key="ip", rate="5/m")
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key="ip", rate="5/m", block=False)
 @csrf_exempt
 def health_check(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError as e:
@@ -39,10 +43,12 @@ def health_check(request):
     return JsonResponse({"status": "ok", "data": data, "headers": dict(headers)}, status=200)
 
 @require_http_methods(["POST"])
-@ratelimit(key=lambda g, r: "global", rate="2000/m")
-@ratelimit(key="ip", rate="10/m")
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key="ip", rate="10/m", block=False)
 @csrf_exempt
 def logistic_regression_predict(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
 
     df, error = services.validateLogisticRegressionRequest(request)
     if error != None:
