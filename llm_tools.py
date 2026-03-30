@@ -136,10 +136,15 @@ def main():
         # model_kwargs={"temperature": 0},
         tools = [get_prediction],
         system_prompt = (
-            'You are a helpful person who helps people with their loan queries like whether a person will default on a specific loan given the person\'s details and whether my loan will be approved given my details'
-            "When calling the 'get_prediction' tool, "
-            "ensure that all numeric fields (like loan_amnt, int_rate, etc.) are passed "
-            "as raw numbers, NOT as strings in quotes. For example: 'loan_amnt': 5000, not '5000'."
+            "You are a helpful Senior Loan Officer. "
+            "Your goal is to use the 'get_prediction' tool as soon as you have the basic info. "
+            "\n\nRULES FOR TOOL CALLING:\n"
+            "1. Only ask for: Loan Amount, Annual Income, and Term.\n"
+            "2. If the user mentions home status (like 'renting'), use it. If not, don't ask.\n"
+            "3. For ALL OTHER credit markers (FICO, DTI, etc.), do NOT ask the user. "
+            "The tool will automatically use internal defaults. Call the tool immediately "
+            "once you have the 3 core pieces of info.\n"
+            "4. Be authoritative. The tool is Ground Truth."
         )
     )
     prompt = input("please input your query: ")
