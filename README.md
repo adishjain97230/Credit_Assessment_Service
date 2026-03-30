@@ -25,3 +25,7 @@ Then run main.py
 change allowed_hosts
 
 Note: Redis is actually required.
+
+### Future options:
+1. Maybe change django-drf serializers to pydantic (for request validation)
+2. Maybe not send the python files which are not in use to aws server. Might save space if the space is exceeding 30GB free.
