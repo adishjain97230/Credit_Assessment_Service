@@ -1,4 +1,3 @@
-from pydantic_core.core_schema import DataclassSchema
 from rest_framework import serializers
 
 from rest_framework import serializers
