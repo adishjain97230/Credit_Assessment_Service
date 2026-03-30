@@ -1,6 +1,10 @@
+from pydantic_core.core_schema import DataclassSchema
 from rest_framework import serializers
 
 from rest_framework import serializers
+from pydantic import BaseModel
+class ChatbotPredictData(BaseModel):
+    prompt: str
 
 class LogisticRegressionDataSerializer(serializers.Serializer):
     int_rate = serializers.FloatField()

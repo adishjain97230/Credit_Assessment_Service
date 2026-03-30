@@ -5,13 +5,14 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from config import logging_config, switch_properties, constants, utils
-from .serializers import LogisticRegressionPredictSerializer
+from .serializers import ChatbotPredictData
 import pandas as pd
 from data_cleaning import dataCleaning
 from models import logistic_regression
 from . import services
 from django_ratelimit.decorators import ratelimit
-
+from pydantic import ValidationError
+from chatbot import llm_tools
 # Create your views here.
 
 logger = logging_config.get_logger(__name__)
@@ -61,3 +62,26 @@ def logistic_regression_predict(request):
 
 
     return JsonResponse({"status": "ok", "threshold": float(threshold), "p": float(p[0])}, status=200)
+
+@require_http_methods(["POST"])
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key="ip", rate="10/m", block=False)
+@csrf_exempt
+def chatbot_chat(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
+    
+    data = json.loads(request.body)
+    try:
+        data_object = ChatbotPredictData.model_validate(data)
+    except ValidationError as e:
+        logger.error("chatbot_predict: invalid data: %s", e)
+        return JsonResponse({"status": "error", "message": "Invalid data"}, status=400)
+
+    data_object.prompt
+    try:
+        response = llm_tools.main(data_object.prompt)
+    except Exception as e:
+        logger.error("chatbot_predict: error: %s", e)
+        return JsonResponse({"status": "error", "message": "Error calling LLM"}, status=500)
+    return JsonResponse({"status": "ok", "response": response}, status=200)
