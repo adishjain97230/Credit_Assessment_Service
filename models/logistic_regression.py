@@ -97,9 +97,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    
-    
-    df = pd.read_parquet(module_properties[constants.dataset_path])
-
-    saveMetaDataForDF(df)
+    main()
