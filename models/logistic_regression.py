@@ -55,7 +55,7 @@ def saveMetaDataForDF(df, num=10):
         for col in df.columns:
             file.write(f"{col}: dtype: {df[col].dtype}\n")
             for i in idxs:
-                file.write(f"{df[i][col]}\n")
+                file.write(f"{df.iloc[i][col]}\n")
             file.write("\n")
 
 

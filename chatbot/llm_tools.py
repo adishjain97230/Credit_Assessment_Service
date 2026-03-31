@@ -66,7 +66,7 @@ class LogisticRegressionModel(BaseModel):
     # CORE USER FIELDS (LLM should ask for these)
     loan_amnt: Union[float, str] = Field(description="The requested loan amount")
     annual_inc: Union[float, str] = Field(description="The borrower's self-reported annual income")
-    term: str = Field(description="The term of the loan, e.g., '36 months' or '60 months'")
+    term: str = Field(description="The term of the loan in months (not years), e.g., '36 months' or '60 months'")
     emp_length: str = Field(default="10+ years", description="Employment length (e.g., '10+ years', '1 year')")
     home_ownership: str = Field(default="MORTGAGE", description="Home status (RENT, OWN, MORTGAGE)")
     purpose: str = Field(default="debt_consolidation", description="Purpose of the loan")
