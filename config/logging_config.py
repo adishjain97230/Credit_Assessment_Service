@@ -29,7 +29,7 @@ def get_logger(name: str | None = None) -> logging.Logger:
     return logging.getLogger(name or constants.credit_assessment)
 
 if __name__ == "__main__":
-    setup_logger()
+    setup_logger(level=logging.DEBUG)
     logger = get_logger()
     logger.info("Hello, world!")
     logger1 = get_logger("data_cleaning")
