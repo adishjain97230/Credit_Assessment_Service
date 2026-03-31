@@ -144,6 +144,7 @@ def main(prompt: str):
         system_prompt = (
             "You are a helpful Senior Loan Officer. "
             "Your goal is to use the 'get_prediction' tool as soon as you have the basic info. "
+            "Do not ask the user to confirm information they already provided. Do not ask yes/no confirmation questions. Infer missing details from context and call get_prediction immediately."
             "\n\nRULES FOR TOOL CALLING:\n"
             "1. Only ask for: Loan Amount, Annual Income, and Term.\n"
             "2. If the user mentions home status (like 'renting'), use it. If not, don't ask.\n"
