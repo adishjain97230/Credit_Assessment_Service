@@ -6,6 +6,7 @@ import numpy as np
 import joblib
 from data_cleaning import dataCleaning
 from pathlib import Path
+from random import randint
 
 logger = logging_config.get_logger(__name__)
 module_properties = switch_properties.SWITCH_PROPERTIES[constants.models]
@@ -46,11 +47,26 @@ def predict(df, model = logistic_regression_model):
 
     return model[constants.model].predict_proba(df)[:, 1], model[constants.p_threshold], None
 
+def saveMetaDataForDF(df, num=10):
+
+    idxs = [randint(0, len(df) - 1) for i in range(num)]
+
+    with open(module_properties[constants.metadata_path], "w") as file:
+        for col in df.columns:
+            file.write(f"{col}: dtype: {df[col].dtype}\n")
+            for i in idxs:
+                file.write(f"{df[i][col]}\n")
+            file.write("\n")
+
+
+
 
 def main():
     logger.info("Logistic Regression Model")
     
     df = pd.read_parquet(module_properties[constants.dataset_path])
+
+    saveMetaDataForDF(df)
 
     split_data = split.SplitData(df, validation_set=True, validation_size=0.2, test_size=0.2)
 
@@ -81,4 +97,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    
+    
+    df = pd.read_parquet(module_properties[constants.dataset_path])
+
+    saveMetaDataForDF(df)

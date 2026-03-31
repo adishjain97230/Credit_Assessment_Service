@@ -70,6 +70,7 @@
     },
     "models": {
         "dataset_path": "data/dataset_data_cleaning.parquet",
+        "metadata_path": "models/cleaned_metaData.txt",
         "logistic_regression": {
             "ohe_columns_threshold": 60,
             "model_path": "models/logistic_regression.joblib"
