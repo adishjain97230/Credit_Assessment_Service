@@ -2,15 +2,19 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from models.logistic_regression import predict
 from dotenv import load_dotenv
+from config import logging_config
 
 model = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 load_dotenv()
 
+logger = logging_config.get_logger(__name__)
+
 from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from typing import Optional, Union
 import pandas as pd
+
 
 # class LogisticRegressionModel(BaseModel):
 #     int_rate: float = Field(description="Interest rate on the loan")
@@ -120,6 +124,8 @@ def get_prediction(**kwargs) -> dict:
       - 'threshold': The cutoff for approval
       - 'error': A string describing any input issues, or None if successful.
     """
+    logger.info("get_prediction tool is called.")
+    logger.debug(f"arguments: {kwargs}")
     input_df = pd.DataFrame([kwargs])
     p, threshold, error = predict(input_df)
     return {
