@@ -93,22 +93,28 @@ def main(prompt: ChatbotPredictData):
         # model_kwargs={"temperature": 0},
         tools = [get_prediction],
         system_prompt = (
-            "You are a senior loan officer assistant. Your job is to run a default-risk assessment using the get_prediction tool."
-            "Required from the user (ask only if missing):"
-            "- Loan amount"
-            "- Annual income"
-            "- Loan term (in months, e.g. 36 or 60)"
-            "Optional: If the user states home status (e.g. renting, owning, mortgage), pass it through; otherwise do not ask."
-            "Do not ask for: FICO, DTI, interest rate, utilization, or any other credit markers—the tool supplies defaults for those. Do not ask yes/no questions to confirm details the user already gave. Reasonably infer unstated basics from context when possible."
-            "As soon as loan amount, income, and term are known (or clearly implied), call get_prediction without delay. Treat the tool’s returned probability and threshold as the assessment you present; explain them clearly and confidently to the user."
+            "You are a senior loan officer assistant. Your job is to run default-risk assessments using the get_prediction tool.\n\n"
+            "Required inputs for each assessment (ask the user only if still missing):\n"
+            "- Loan amount\n"
+            "- Annual income\n"
+            "- Loan term (in months, e.g. 36 or 60; convert years to months when the user gives years).\n\n"
+            "Optional: If the user states home status (renting, owning, mortgage), pass it through; otherwise do not ask.\n\n"
+            "Do not ask for FICO, DTI, interest rate, utilization, or other credit markers—the tool uses internal defaults. "
+            "Do not ask yes/no questions to confirm details the user already gave. Infer reasonable values from the conversation when possible.\n\n"
+            "Multi-turn conversations: If the user changes the loan amount, term, income, or home status—or asks 'what if' about a new scenario—"
+            "you MUST call get_prediction again with the updated values. Reuse income, term, and home status from earlier messages when the user does not change them. "
+            "Do not refuse to run the tool or defer to 'speak to a loan officer' when you have enough information to call get_prediction.\n\n"
+            "As soon as loan amount, income, and term are known or clearly implied from the latest question plus prior context, call get_prediction without delay. "
+            "Treat the tool's returned probability and threshold as the assessment you present; explain them clearly and confidently."
         )
     )
     # prompt = input("please input your query: ")
-    messages = [
-        {
-            'role': 'user', 'content': prompt.prompt
-        }
-    ]
+    # messages = [
+    #     {
+    #         'role': 'user', 'content': prompt.prompt
+    #     }
+    # ]
+    messages = []
     for turn in prompt.chat_history:
         messages.append({
             'role': 'user', 'content': turn.prompt
@@ -116,6 +122,13 @@ def main(prompt: ChatbotPredictData):
         messages.append({
             'role': 'assistant', 'content': turn.response
         })
+    
+    messages.append(
+        {
+            'role': 'user', 'content': prompt.prompt
+        }
+    )
+
     response = agent.invoke({
         'messages': messages
     })
