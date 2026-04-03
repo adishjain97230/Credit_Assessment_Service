@@ -1,9 +1,14 @@
 from rest_framework import serializers
 
 from rest_framework import serializers
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+class ChatTurn(BaseModel):
+    prompt: str
+    response: str
 class ChatbotPredictData(BaseModel):
     prompt: str
+    chat_history: list[ChatTurn] = Field(default_factory=list)
 
 class LogisticRegressionDataSerializer(serializers.Serializer):
     int_rate = serializers.FloatField()

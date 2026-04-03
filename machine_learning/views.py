@@ -78,9 +78,8 @@ def chatbot_chat(request):
         logger.error("chatbot_predict: invalid data: %s", e)
         return JsonResponse({"status": "error", "message": "Invalid data"}, status=400)
 
-    data_object.prompt
     try:
-        response = llm_tools.main(data_object.prompt)
+        response = llm_tools.main(data_object)
     except Exception as e:
         logger.error("chatbot_predict: error: %s", e)
         return JsonResponse({"status": "error", "message": "Error calling LLM"}, status=500)

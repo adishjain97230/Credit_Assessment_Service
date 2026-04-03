@@ -3,6 +3,7 @@ from langchain.tools import tool
 from models.logistic_regression import predict
 from dotenv import load_dotenv
 from config import logging_config
+from machine_learning.serializers import ChatbotPredictData
 
 model = "meta-llama/llama-4-scout-17b-16e-instruct"
 
@@ -14,53 +15,6 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import tool
 from typing import Optional, Union
 import pandas as pd
-
-
-# class LogisticRegressionModel(BaseModel):
-#     int_rate: float = Field(description="Interest rate on the loan")
-#     installment: float = Field(description="The monthly payment owed if the loan originates")
-#     sub_grade: str = Field(description="Assigned loan subgrade")
-#     dti: float = Field(description="Debt-to-income ratio")
-#     initial_list_status: str = Field(description="Initial listing status of the loan")
-#     mths_since_last_delinq: float = Field(description="Months since the last delinquency")
-#     mths_since_last_record: float = Field(description="Months since the last public record")
-#     num_op_rev_tl: float = Field(description="Number of open revolving accounts")
-#     zip_code: str = Field(description="First 3 digits of the zip code")
-#     delinq_2yrs: float = Field(description="Number of 30+ days past due incidences in past 2 years")
-#     revol_util: float = Field(description="Revolving line utilization rate")
-#     term: str = Field(description="The number of payments on the loan (e.g., '36 months')")
-#     percent_bc_gt_75: float = Field(description="Percentage of all bankcard accounts > 75% limit")
-#     tot_hi_cred_lim: float = Field(description="Total high credit/limit")
-#     num_bc_sats: float = Field(description="Number of satisfactory bankcard accounts")
-#     num_il_tl: float = Field(description="Number of installment accounts")
-#     pct_tl_nvr_dlq: float = Field(description="Percent of trades never delinquent")
-#     tot_coll_amt: float = Field(description="Total collection amounts ever owed")
-#     emp_length: str = Field(description="Employment length in years")
-#     total_rev_hi_lim: float = Field(description="Total revolving high credit/limit")
-#     application_type: str = Field(description="Indicates whether the loan is an individual or joint app")
-#     open_acc: float = Field(description="Number of open credit lines")
-#     inq_last_6mths: float = Field(description="Number of inquiries in last 6 months")
-#     loan_amnt: float = Field(description="The listed amount of the loan")
-#     num_rev_accts: float = Field(description="Number of revolving accounts")
-#     tax_liens: float = Field(description="Number of tax liens")
-#     earliest_cr_line: str = Field(description="The month the earliest reported credit line was opened")
-#     revol_bal: float = Field(description="Total credit revolving balance")
-#     acc_now_delinq: float = Field(description="Number of accounts on which the borrower is now delinquent")
-#     num_bc_tl: float = Field(description="Number of bankcard accounts")
-#     fico_range_high: float = Field(description="FICO range high at time of application")
-#     addr_state: str = Field(description="The state provided by the borrower")
-#     home_ownership: str = Field(description="Home ownership status")
-#     tot_cur_bal: float = Field(description="Total current balance of all accounts")
-#     annual_inc: float = Field(description="The self-reported annual income")
-#     pub_rec_bankruptcies: float = Field(description="Number of public record bankruptcies")
-#     verification_status: str = Field(description="Indicates if income was verified")
-#     num_rev_tl_bal_gt_0: float = Field(description="Number of revolving trades with balance > 0")
-#     purpose: str = Field(description="A category provided by the borrower for the loan request")
-#     fico_range_low: float = Field(description="FICO range low at time of application")
-#     disbursement_method: str = Field(description="The method by which the borrower receives funds")
-#     collections_12_mths_ex_med: float = Field(description="Number of collections in 12 months excluding medical")
-#     total_acc: float = Field(description="The total number of credit lines currently in the borrower's file")
-#     pub_rec: float = Field(description="Number of derogatory public records")
 
 class LogisticRegressionModel(BaseModel):
     # CORE USER FIELDS (LLM should ask for these)
@@ -132,34 +86,38 @@ def get_prediction(**kwargs) -> dict:
         "threshold": threshold
     }
 
-def main(prompt: str):
-
-
+def main(prompt: ChatbotPredictData):
 
     agent = create_agent(
         model = f"groq:{model}",
         # model_kwargs={"temperature": 0},
         tools = [get_prediction],
         system_prompt = (
-            "You are a helpful Senior Loan Officer. "
-            "Your goal is to use the 'get_prediction' tool as soon as you have the basic info. "
-            "Do not ask the user to confirm information they already provided. Do not ask yes/no confirmation questions. Infer missing details from context and call get_prediction immediately."
-            "\n\nRULES FOR TOOL CALLING:\n"
-            "1. Only ask for: Loan Amount, Annual Income, and Term.\n"
-            "2. If the user mentions home status (like 'renting'), use it. If not, don't ask.\n"
-            "3. For ALL OTHER credit markers (FICO, DTI, etc.), do NOT ask the user. "
-            "The tool will automatically use internal defaults. Call the tool immediately "
-            "once you have the 3 core pieces of info.\n"
-            "4. Be authoritative. The tool is Ground Truth."
+            "You are a senior loan officer assistant. Your job is to run a default-risk assessment using the get_prediction tool."
+            "Required from the user (ask only if missing):"
+            "- Loan amount"
+            "- Annual income"
+            "- Loan term (in months, e.g. 36 or 60)"
+            "Optional: If the user states home status (e.g. renting, owning, mortgage), pass it through; otherwise do not ask."
+            "Do not ask for: FICO, DTI, interest rate, utilization, or any other credit markers—the tool supplies defaults for those. Do not ask yes/no questions to confirm details the user already gave. Reasonably infer unstated basics from context when possible."
+            "As soon as loan amount, income, and term are known (or clearly implied), call get_prediction without delay. Treat the tool’s returned probability and threshold as the assessment you present; explain them clearly and confidently to the user."
         )
     )
     # prompt = input("please input your query: ")
+    messages = [
+        {
+            'role': 'user', 'content': prompt
+        }
+    ]
+    for turn in prompt.chat_history:
+        messages.append({
+            'role': 'user', 'content': turn.prompt
+        })
+        messages.append({
+            'role': 'assistant', 'content': turn.response
+        })
     response = agent.invoke({
-        'messages': [
-            {
-                'role': 'user', 'content': prompt
-            }
-        ]
+        'messages': messages
     })
     # print(response)
     # print(response['messages'][-1].content)
@@ -221,4 +179,4 @@ def main(prompt: str):
 #     print(f"\nAI: {response['output']}")
 
 if __name__ == "__main__":
-    main()
+    main(input("Give Query"))
