@@ -79,6 +79,7 @@ def get_prediction(**kwargs) -> dict:
       - 'error': A string describing any input issues, or None if successful.
     """
     logger.info("get_prediction tool is called.")
+    logger.debug("kwargs: %s", kwargs)
     input_df = pd.DataFrame([kwargs])
     p, threshold, error = predict(input_df)
     return {
