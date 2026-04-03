@@ -87,11 +87,10 @@ def get_prediction(**kwargs) -> dict:
         "threshold": threshold
     }
 
-def main(prompt: ChatbotPredictData):
+def askModel(prompt: ChatbotPredictData):
 
     agent = create_agent(
         model = f"groq:{model}",
-        # model_kwargs={"temperature": 0},
         tools = [get_prediction],
         system_prompt = (
             "You are a loan default assessment assistant for this app only. You help users understand whether the "
@@ -117,12 +116,6 @@ def main(prompt: ChatbotPredictData):
             "Keep replies concise and on-topic."
         )
     )
-    # prompt = input("please input your query: ")
-    # messages = [
-    #     {
-    #         'role': 'user', 'content': prompt.prompt
-    #     }
-    # ]
     messages = []
     for turn in prompt.chat_history:
         messages.append({
@@ -137,68 +130,10 @@ def main(prompt: ChatbotPredictData):
             'role': 'user', 'content': prompt.prompt
         }
     )
-
     response = agent.invoke({
         'messages': messages
     })
-    # print(response)
-    # print(response['messages'][-1].content)
     return response['messages'][-1].content
 
-# def main2():
-#     content = input()
-#     client = Groq()
-#     completion = client.chat.completions.create(
-#         model="meta-llama/llama-4-scout-17b-16e-instruct",
-#         messages=[
-#         {
-#             "role": "user",
-#             "content": ""
-#         }
-#         ],
-#         temperature=1,
-#         max_completion_tokens=1024,
-#         top_p=1,
-#         stream=True,
-#         stop=None
-#     )
-
-#     for chunk in completion:
-#         print(chunk.choices[0].delta.content or "", end="")
-
-# def main2():
-#     # 2. Initialize Groq LLM
-#     llm = ChatGroq(
-#         model="meta-llama/llama-4-scout-17b-16e-instruct",
-#         groq_api_key=api_key,
-#         temperature=0
-#     )
-
-#     # 3. Pull the standard ReAct prompt template
-#     # This template contains the "Thought/Action/Observation" logic the LLM needs
-#     base_prompt = hub.pull("hwchase17/react")
-    
-#     # 4. Create the Agent
-#     # We pass the system instructions by modifying the base prompt
-#     # In this version, we use 'create_agent' which is the stable V1.0+ way
-#     agent = create_agent(llm, [get_prediction], base_prompt)
-
-#     # 5. Create the Executor (This actually runs the agent loop)
-#     agent_executor = AgentExecutor(
-#         agent=agent, 
-#         tools=[get_prediction], 
-#         verbose=True, 
-#         handle_parsing_errors=True
-#     )
-
-#     # 6. Execution
-#     print("System: I'm ready. I treat the prediction tool as Ground Truth.")
-#     user_query = input("User: ")
-    
-#     # Standard invoke for the new AgentExecutor
-#     response = agent_executor.invoke({"input": user_query})
-    
-#     print(f"\nAI: {response['output']}")
-
 if __name__ == "__main__":
-    main(input("Give Query"))
+    askModel(input("Give Query"))
