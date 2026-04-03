@@ -4,8 +4,11 @@ from models.logistic_regression import predict
 from dotenv import load_dotenv
 from config import logging_config
 from machine_learning.serializers import ChatbotPredictData
+from config import switch_properties, constants
 
-model = "meta-llama/llama-4-scout-17b-16e-instruct"
+module_properties = switch_properties.SWITCH_PROPERTIES[constants.chatbot]
+
+model = module_properties[constants.llm_model]
 
 load_dotenv()
 
@@ -117,18 +120,21 @@ def askModel(prompt: ChatbotPredictData):
         )
     )
     messages = []
-    if (len(prompt.chat_history) > 10): prompt.chat_history = prompt.chat_history[-10:]
+    max_chat_history = module_properties[constants.max_chat_history]
+    max_prompt_length = module_properties[constants.max_prompt_length]
+    max_response_length = module_properties[constants.max_response_length]
+    if (len(prompt.chat_history) > max_chat_history): prompt.chat_history = prompt.chat_history[-max_chat_history:]
     for turn in prompt.chat_history:
         messages.append({
-            'role': 'user', 'content': turn.prompt
+            'role': 'user', 'content': turn.prompt if len(turn.prompt) <= max_prompt_length else turn.prompt[-max_prompt_length:]
         })
         messages.append({
-            'role': 'assistant', 'content': turn.response
+            'role': 'assistant', 'content': turn.response if len(turn.response) <= max_response_length else turn.response[-max_response_length:]
         })
     
     messages.append(
         {
-            'role': 'user', 'content': prompt.prompt
+            'role': 'user', 'content': prompt.prompt if len(prompt.prompt) <= max_prompt_length else prompt.prompt[-max_prompt_length:]
         }
     )
     response = agent.invoke({
