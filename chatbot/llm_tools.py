@@ -117,6 +117,7 @@ def askModel(prompt: ChatbotPredictData):
         )
     )
     messages = []
+    if (len(prompt.chat_history) > 10): prompt.chat_history = prompt.chat_history[-10:]
     for turn in prompt.chat_history:
         messages.append({
             'role': 'user', 'content': turn.prompt
