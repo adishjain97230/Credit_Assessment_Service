@@ -106,7 +106,7 @@ def main(prompt: ChatbotPredictData):
     # prompt = input("please input your query: ")
     messages = [
         {
-            'role': 'user', 'content': prompt
+            'role': 'user', 'content': prompt.prompt
         }
     ]
     for turn in prompt.chat_history:
