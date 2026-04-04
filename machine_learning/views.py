@@ -17,9 +17,20 @@ from chatbot import llm_tools
 
 logger = logging_config.get_logger(__name__)
 
+def get_real_ip(group, request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        # The list looks like: "spoofed_ip, real_ip"
+        # We split by comma and take the last one (strip spaces just in case)
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        # No proxy? Fallback to standard remote addr
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 @require_http_methods(["GET"])
 @ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
-@ratelimit(key="ip", rate="20/m", block=False)
+@ratelimit(key=get_real_ip, rate="20/m", block=False)
 def health(request):
     if getattr(request, 'limited', False):
         return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
@@ -27,7 +38,7 @@ def health(request):
 
 @require_http_methods(["POST"])
 @ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
-@ratelimit(key="ip", rate="5/m", block=False)
+@ratelimit(key=get_real_ip, rate="5/m", block=False)
 @csrf_exempt
 def health_check(request):
     if getattr(request, 'limited', False):
@@ -45,7 +56,7 @@ def health_check(request):
 
 @require_http_methods(["POST"])
 @ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
-@ratelimit(key="ip", rate="10/m", block=False)
+@ratelimit(key=get_real_ip, rate="10/m", block=False)
 @csrf_exempt
 def logistic_regression_predict(request):
     if getattr(request, 'limited', False):
@@ -65,7 +76,7 @@ def logistic_regression_predict(request):
 
 @require_http_methods(["POST"])
 @ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
-@ratelimit(key="ip", rate="10/m", block=False)
+@ratelimit(key=get_real_ip, rate="10/m", block=False)
 @csrf_exempt
 def chatbot_chat(request):
     if getattr(request, 'limited', False):
