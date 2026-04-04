@@ -66,6 +66,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://frontendach.vercel.app",
 ]
 
 ROOT_URLCONF = 'credit_site.urls'
