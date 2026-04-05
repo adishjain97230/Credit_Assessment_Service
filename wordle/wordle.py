@@ -179,5 +179,48 @@
 #     print("Remaining possible words:", len(new_words))
 
 
-with open("valid-wordle-words.txt", "r") as f:
-    words = [line.strip() for line in f if line.strip()]
+import pickle
+import random
+from pathlib import Path
+
+def getWordCounts():
+    path = Path("wordle/word_counts.pkl")
+
+    with path.open("rb") as f:
+        word_counts = pickle.load(f)
+    
+    return [word[0] for word in word_counts], {word[0]: word[1] for word in word_counts}
+
+words, word_counts = getWordCounts()
+
+def get_word():
+    return words[random.randint(0, len(words) - 1)]
+
+def get_feedback(word, guess):
+    if len(word) != 5 or len(guess) != 5:
+        return None, ValueError("Word and guess must be 5 characters long")
+    
+    if word not in word_counts:
+        return None, ValueError("Word is not a valid word")
+
+
+    freq_word = {}
+
+    for i in range(5):
+        if word[i] not in freq_word:
+            freq_word[word[i]] = 0
+        freq_word[word[i]] += 1
+    
+    feedback = [0] * 5
+    
+    for i in range(5):
+        if word[i] == guess[i]:
+            feedback[i] = 2
+            freq_word[word[i]] -= 1
+    
+    for i in range(5):
+        if feedback[i] == 0 and guess[i] in freq_word and freq_word[guess[i]] > 0:
+            feedback[i] = 1
+            freq_word[guess[i]] -= 1
+    
+    return feedback

@@ -20,5 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path("machine-learning/", include("machine_learning.urls"))
+    path("machine-learning/", include("machine_learning.urls")),
+    path("wordle/", include("wordle.urls")),
 ]

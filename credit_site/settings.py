@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 
     
     'machine_learning',
+    "wordle",
 ]
 
 MIDDLEWARE = [
