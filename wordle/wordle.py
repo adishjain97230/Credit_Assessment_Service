@@ -182,6 +182,9 @@
 import pickle
 import random
 from pathlib import Path
+from config import logging_config
+
+logger = logging_config.get_logger(__name__)
 
 def getWordCounts():
     path = Path("wordle/word_counts.pkl")
@@ -197,6 +200,7 @@ def get_word():
     return words[random.randint(0, len(words) - 1)]
 
 def get_feedback(word, guess):
+    logger.debug("length of word_counts: %s", len(word_counts))
     if len(word) != 5 or len(guess) != 5:
         return None, ValueError("Word and guess must be 5 characters long")
     
