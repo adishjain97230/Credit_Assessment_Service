@@ -10,3 +10,11 @@ def saveWord(word):
     )
 
     return entry.id
+
+def getWord(id: int):
+    entry = WordEntry.objects.filter(pk=id).first()
+    if entry is None:
+        return None, ValueError("Word not found")
+    if entry.expires_at < timezone.now():
+        return None, ValueError("Word has expired")
+    return entry.word, None

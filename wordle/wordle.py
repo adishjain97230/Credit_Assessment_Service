@@ -223,4 +223,4 @@ def get_feedback(word, guess):
             feedback[i] = 1
             freq_word[guess[i]] -= 1
     
-    return feedback
+    return feedback, None

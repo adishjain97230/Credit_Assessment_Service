@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from wordle import wordle, services
 import json
+from wordle.serializers import CheckWordRequest
+from pydantic import ValidationError
 
 # Create your views here.
 logger = logging_config.get_logger(__name__)
@@ -57,3 +59,35 @@ def get_word(request):
     
     word = wordle.get_word()
     return JsonResponse({"status": "ok", "word_id": services.saveWord(word)}, status=200)
+
+@require_http_methods(["POST"])
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key=get_real_ip, rate="20/m", block=False)
+@csrf_exempt
+def check_word(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
+    
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        logger.error("check_word: invalid JSON: %s", e)
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    
+    try:
+        data_object = CheckWordRequest.model_validate(data)
+    except ValidationError as e:
+        logger.error("check_word: invalid data: %s", e)
+        return JsonResponse({"status": "error", "message": "Invalid data"}, status=400)
+    
+    word, err = services.getWord(data_object.word_id)
+    if err is not None:
+        logger.error("check_word: error getting word: %s", err)
+        return JsonResponse({"status": "error", "message": f"Error getting word: {str(err)}"}, status=400)
+    
+    feedback, err = wordle.get_feedback(word, data_object.guess)
+    if err is not None:
+        logger.error("check_word: error getting feedback: %s", err)
+        return JsonResponse({"status": "error", "message": f"Error getting feedback: {str(err)}"}, status=400)
+    
+    return JsonResponse({"status": "ok", "feedback": feedback}, status=200)
