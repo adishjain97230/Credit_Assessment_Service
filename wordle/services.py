@@ -9,4 +9,4 @@ def saveWord(word):
         expires_at=timezone.now() + timedelta(hours=1),
     )
 
-    return entry.word_id
+    return entry.id
