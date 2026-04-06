@@ -182,12 +182,14 @@
 import pickle
 import random
 from pathlib import Path
-from config import logging_config
+from config import logging_config, switch_properties, constants
+
+module_properties = switch_properties.SWITCH_PROPERTIES[constants.wordle]
 
 logger = logging_config.get_logger(__name__)
 
 def getWordCounts():
-    path = Path("wordle/word_counts.pkl")
+    path = Path(module_properties[constants.words_path])
 
     with path.open("rb") as f:
         word_counts = pickle.load(f)
@@ -197,7 +199,7 @@ def getWordCounts():
 words, word_counts = getWordCounts()
 
 def get_word():
-    return words[random.randint(0, len(words) - 1)]
+    return words[random.randint(0, min(len(words), module_properties[constants.top_n_get_words]) - 1)]
 
 def get_feedback(word, guess):
     if len(word) != 5 or len(guess) != 5:

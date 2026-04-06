@@ -34,3 +34,7 @@ llm_model = "llm_model"
 max_chat_history = "max_chat_history"
 max_prompt_length = "max_prompt_length"
 max_response_length = "max_response_length"
+
+wordle = "wordle"
+words_path = "words_path"
+top_n_get_words = "top_n_get_words"

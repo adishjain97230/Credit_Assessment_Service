@@ -81,5 +81,9 @@
         "max_chat_history": 10,
         "max_prompt_length": 2000,
         "max_response_length": 4000
+    },
+    "wordle": {
+        "words_path": "wordle/word_counts.pkl",
+        "top_n_get_words": 5000
     }
 }
