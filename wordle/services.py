@@ -1,2 +1,12 @@
+from datetime import timedelta
+from django.utils import timezone
+from wordle.models import WordEntry
+
+
 def saveWord(word):
-    return 1
+    entry = WordEntry.objects.create(
+        word=word,
+        expires_at=timezone.now() + timedelta(hours=1),
+    )
+
+    return entry.word_id
