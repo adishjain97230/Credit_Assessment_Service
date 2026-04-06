@@ -82,7 +82,11 @@ def chatbot_chat(request):
     if getattr(request, 'limited', False):
         return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
     
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError as e:
+        logger.error("chatbot_chat: invalid JSON: %s", e)
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
     try:
         data_object = ChatbotPredictData.model_validate(data)
     except ValidationError as e:

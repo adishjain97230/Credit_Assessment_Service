@@ -3,6 +3,7 @@ from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from wordle import wordle, services
 import json
 
 # Create your views here.
@@ -46,3 +47,13 @@ def health_check(request):
     logger.info("printing headers: %s", dict(headers))
     return JsonResponse({"status": "ok", "data": data, "headers": dict(headers)}, status=200)
 
+@require_http_methods(["GET"])
+@ratelimit(key=lambda g, r: "global", rate="2000/m", block=False)
+@ratelimit(key=get_real_ip, rate="5/m", block=False)
+@csrf_exempt
+def get_word(request):
+    if getattr(request, 'limited', False):
+        return JsonResponse({"status": "error", "message": "Too many requests"}, status=403)
+    
+    word = wordle.get_word()
+    return JsonResponse({"status": "ok", "word_id": services.saveWord(word)}, status=200)
