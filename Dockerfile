@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-CMD ["uvicorn", "credit_site.asgi:application", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+CMD ["uvicorn", "credit_site.asgi:application", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
