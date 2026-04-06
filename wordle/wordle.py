@@ -200,11 +200,10 @@ def get_word():
     return words[random.randint(0, len(words) - 1)]
 
 def get_feedback(word, guess):
-    logger.debug("length of word_counts: %s", len(word_counts))
     if len(word) != 5 or len(guess) != 5:
         return None, ValueError("Word and guess must be 5 characters long")
     
-    if word not in word_counts:
+    if guess not in word_counts:
         return None, ValueError("Word is not a valid word")
 
 
