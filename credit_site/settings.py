@@ -14,7 +14,6 @@ from pathlib import Path
 from config import switch_properties, constants
 import os
 from dotenv import load_dotenv
-import pymysql
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,8 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 load_dotenv(BASE_DIR / '.env')
-
-pymysql.install_as_MySQLdb()
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
