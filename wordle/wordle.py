@@ -205,8 +205,8 @@ def get_feedback(word, guess):
     if len(word) != 5 or len(guess) != 5:
         return None, ValueError("Word and guess must be 5 characters long")
     
-    # if guess not in word_counts:
-    #     return None, ValueError("Word is not a valid word")
+    if guess not in word_counts:
+        return None, ValueError("Word is not a valid word")
 
 
     freq_word = {}
