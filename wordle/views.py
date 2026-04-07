@@ -88,6 +88,6 @@ def check_word(request):
     feedback, err = wordle.get_feedback(word, data_object.guess)
     if err is not None:
         logger.error("check_word: error getting feedback: %s", err)
-        return JsonResponse({"status": "error", "message": f"Error getting feedback: {str(err)}"}, status=400)
+        return JsonResponse({"status": "error", "message": f"Error getting feedback: {str(err)}", "word_valid": False}, status=400)
     
     return JsonResponse({"status": "ok", "feedback": feedback}, status=200)
